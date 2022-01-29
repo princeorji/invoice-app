@@ -1,4 +1,7 @@
-from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+
 from .models import Client
 from .forms import ClientForm, BillForm
 
@@ -15,22 +18,23 @@ def dash_detail(request, pk):
     client = Client.objects.get(pk=pk)
     return render(request, 'dash_details.html', {'client': client})
 
+def create_client(request):
+    form = ClientForm()
+
+    if request.method == 'POST':
+        form = ClientForm(request.POST)
+        if form.is_valid():
+            return HttpResponseRedirect(reverse('create_bill'))
+    return render(request, 'create_client.html', {'form': form})
+
 def create_bill(request):
-    f_client = ClientForm()
-    f_bill = BillForm()
+    form = BillForm()
 
     if request.method == 'POST':
-            f_client = ClientForm(request.POST)
-            if f_client.is_valid():
-                f_client.save()
-
-    if request.method == 'POST':
-            f_bill = ClientForm(request.POST)
-            if f_bill.is_valid():
-                f_bill.save()
-                return redirect('dashboard')
-    context = {
-        'f_client': f_client,
-        'f_bill': f_bill
-    }
-    return render(request, 'create_bill.html', context)
+        form = BillForm(request.POST)
+        if form.is_valid():
+            form.save(commit=False)
+            form = Client.objects.create()
+            form.save()
+            return HttpResponseRedirect(reverse('dashboard'))
+    return render(request, 'create_bill.html', {'form': form})

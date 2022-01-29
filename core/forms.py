@@ -10,3 +10,4 @@ class BillForm(ModelForm):
     class Meta:
         model = Bill
         fields = '__all__'
+        exclude = ('item',)
