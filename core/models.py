@@ -27,4 +27,4 @@ class Bill(models.Model):
         return "$%s" % self.rate
 
     def __str__(self):
-        return self.item
+        return str(self.item)
