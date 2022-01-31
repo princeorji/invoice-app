@@ -18,51 +18,39 @@ def dash_detail(request, pk):
     client = Client.objects.get(pk=pk)
     return render(request, 'dash_details.html', {'client': client})
 
-def create_client(request):
-    form = ClientForm()
+def create_invoice(request):
+    f_client = ClientForm
+    f_bill = BillForm
 
     if request.method == 'POST':
-        form = ClientForm(request.POST)
-        if form.is_valid():
-            return HttpResponseRedirect(reverse('create-bill'))
-    return render(request, 'create_client.html', {'form': form})
-
-def create_bill(request):
-    form = BillForm()
-
-    if request.method == 'POST':
-        form = BillForm(request.POST)
-        if form.is_valid():
-            form.save(commit=False)
-            form = Client.objects.create()
-            form.save()
+        f_client = ClientForm(request.POST or None)
+        f_bill = BillForm(request.POST or None)
+        if f_client.is_valid() or f_bill.is_valid():
+            f_client.save()
+            f_bill.save()
             return HttpResponseRedirect(reverse('dashboard'))
-    return render(request, 'create_bill.html', {'form': form})
+    return render(request, 'create_invoice.html', {
+        'f_client': f_client,
+        'f_bill': f_bill
+    })
 
-def update_client(request, pk):
+def update_invoice(request, pk):
     client = Client.objects.get(pk=pk)
-    form = ClientForm(instance=client)
-
-    if request.method == 'POST':
-        form = ClientForm(request.POST, instance=client)
-        if form.is_valid():
-            return HttpResponseRedirect(reverse('update-bill'))
-    return render(request, 'update_client.html', {'form': form})
-
-def update_bill(request, pk):
     bill = Bill.objects.get(pk=pk)
-    form = BillForm(instance=bill)
 
     if request.method == 'POST':
-        form = BillForm(request.POST, instance=bill)
-        if form.is_valid():
-            form.save(commit=False)
-            form = Client.objects.create()
-            form.save()
+        f_client = ClientForm(request.POST, instance=client)
+        f_bill = BillForm(request.POST, instance=bill)
+        if f_client.is_valid() or f_bill.is_valid():
+            f_client.save()
+            f_bill.save()
             return HttpResponseRedirect(reverse('dashboard'))
-    return render(request, 'update_bill.html', {'form': form})
+    return render(request, 'update_invoice.html', {
+        'f_client': f_client,
+        'f_bill': f_bill
+    })
 
-def delete_client_bill(request, pk):
+def delete_invoice(request, pk):
     client = Client.objects.get(pk=pk)
     bill = Bill.objects.get(pk=pk)
 
@@ -70,9 +58,8 @@ def delete_client_bill(request, pk):
         client.delete()
         bill.delete()
         return HttpResponseRedirect(reverse('dashboard'))
-    context = {
+    return render(request, 'delete_invoice.html', {
         'client': client,
         'bill': bill
-    }
-    return render(request, 'delete_client_bill.html', context)
+    })
 
