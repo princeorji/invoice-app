@@ -10,13 +10,12 @@ class Client(models.Model):
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
     organisation = models.CharField(max_length=50, blank=True)
-    item = models.CharField(max_length=25)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
 class Bill(models.Model):
-    item = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True)
+    item = models.CharField(max_length=25)
     description = models.TextField(blank=True)
     rate = models.DecimalField(max_digits=8, decimal_places=2)
     hours = models.IntegerField(default=1)
@@ -27,4 +26,4 @@ class Bill(models.Model):
         return "$%s" % self.rate
 
     def __str__(self):
-        return str(self.item)
+        return self.item
