@@ -15,15 +15,20 @@ class Client(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 class Bill(models.Model):
+    PAYMENT_STATUS = (
+        (1, 'Pending'),
+        (2, 'Paid')
+    )
     item = models.CharField(max_length=25)
     description = models.TextField(blank=True)
     rate = models.DecimalField(max_digits=8, decimal_places=2)
     hours = models.IntegerField(default=1)
     pay_date = models.DateField()
+    status = models.PositiveIntegerField(choices=PAYMENT_STATUS, default=1)
 
     @property
     def rate_display(self):
         return "$%s" % self.rate
 
     def __str__(self):
-        return self.item
+        return f"{self.item} {self.status}"
