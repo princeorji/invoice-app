@@ -1,6 +1,6 @@
-from django.urls import reverse
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.db.models import Q
+from django.shortcuts import render, redirect
+from django.core.paginator import Paginator
 
 from .models import Client, Bill
 from .forms import ClientForm, BillForm
@@ -9,6 +9,31 @@ from .forms import ClientForm, BillForm
 
 def index(request):
     return render(request, 'index.html')
+
+def invoice_list(request):
+    clients = Client.objects.all()
+    paginator = Paginator(clients, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    client_search = clients.filter(Q(name__icontains=q))
+
+    context = {
+        'clients': clients,
+        'page_obj': page_obj,
+        'client_search': client_search
+    }
+    return render(request, 'invoice_list.html', context)
+
+def invoice_detail(request, pk):
+    client = Client.objects.get(pk=pk)
+    bill = Bill.objects.filter(client=client)
+    context = {
+        'client': client,
+        'bill': bill
+    }
+    return render(request, 'invoice_detail.html', context)
 
 def create_invoice(request):
     f_client = ClientForm
@@ -20,11 +45,12 @@ def create_invoice(request):
         if f_client.is_valid() or f_bill.is_valid():
             f_client.save()
             f_bill.save()
-            return HttpResponseRedirect(reverse('core:index'))
-    return render(request, 'create_invoice.html', {
+            return redirect('core:index')
+    context = {
         'f_client': f_client,
         'f_bill': f_bill
-    })
+    }
+    return render(request, 'cru_invoice.html', context)
 
 def update_invoice(request, pk):
     client = Client.objects.get(pk=pk)
@@ -39,11 +65,12 @@ def update_invoice(request, pk):
         if f_client.is_valid() or f_bill.is_valid():
             f_client.save()
             f_bill.save()
-            return HttpResponseRedirect(reverse('core:index'))
-    return render(request, 'update_invoice.html', {
+            return redirect('core:index')
+    context = {
         'f_client': f_client,
         'f_bill': f_bill
-    })
+    }
+    return render(request, 'cru_invoice.html', context)
 
 def delete_invoice(request, pk):
     client = Client.objects.get(pk=pk)
@@ -52,9 +79,10 @@ def delete_invoice(request, pk):
     if request.method == 'POST':
         client.delete()
         bill.delete()
-        return HttpResponseRedirect(reverse('core:index'))
-    return render(request, 'delete_invoice.html', {
+        return redirect('core:index')
+    context = {
         'client': client,
         'bill': bill
-    })
+    }
+    return render(request, 'delete_invoice.html', context)
 
