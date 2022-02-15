@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <h1>Invoice</h1>
+    <h3>Invoice Summary</h3>
+    <div>
+        <strong>From</strong>
+        <p>{{client.last_name}}, {{client.first_name}}</p>
+        <p>{{client.email}}</p>
+        <p>{{client.phone_number}}</p>
+        <p>{{client.organisation}}</p>
+    </div><br>
+    <div>
+        {% for bill in bill %}
+            <p>{{bill.item}}</p>
+            <p>{{bill.description}}</p>
+            <p>{{bill.rate}}</p>
+            <p>{{bill.hours}}</p>
+            <p>{{bill.pay_date}}</p>
+            <p>{{bill.status}}</p>
+            <a href="{{request.META.HTTP_REFERER}}">Back</a>
+        {% endfor %}
+    </div>
+{% endblock %}

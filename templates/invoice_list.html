@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <h3>Invoice List
+        <span>
+            <a href="{% url 'core:create-invoice' %}">+ Add new Invoice</a>
+        </span>
+    </h3>
+
+    <form action="{% url 'core:invoice-list' %}" method="get">
+        <input type="text" name="q" placeholder="search...">
+    </form>
+
+    <div>
+        {% for client in clients %}
+            <table>
+                <tr>
+                    <th>id</th>
+                    <th>first name</th>
+                    <th>last name</th>
+                    <th>email</th>
+                    <th>organisation</th>
+                    <th>status</th>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="{% url 'core:invoice-detail' client.pk %}">{{client.uuid}}</a>
+                    </td>
+                    <td>{{client.first_name}}</td>
+                    <td>{{client.last_name}}</td>
+                    <td>{{client.email}}</td>
+                    <td>{{client.organisation}}</td>
+                    <td></td>
+                    <td>
+                        <a href="{% url 'core:update-invoice' client.pk %}">Edit</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'core:delete-invoice' client.pk %}">Delete</a>
+                    </td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+    <div class="pagination">
+        <span>
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo;first</a>
+                <a href="?page={{page_obj.previous_page_number}}">previous</a>
+            {% endif %}
+            <span>
+                Page {{page_obj.number}} of {{page_obj.paginator.num_pages}}
+            </span>
+            {% if page_obj.has_next %}
+                <a href="?page={{page_obj.next_page_number}}">next</a>
+                <a href="?page={{page_obj.paginator.num_pages}}">last &laquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% endblock %}

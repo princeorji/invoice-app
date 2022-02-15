@@ -1,9 +1,13 @@
-<h2>Delete Invoice:</h2>
-<div>
-    <form action="" method="post">
-        {% csrf_token %}
-        <p>Delete invoice?</p>
-        <a href="{{request.META.HTTP_REFERER}}">Back</a>
-        <button type="submit">Delete</button>
-    </form>
-</div>
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <h2>Delete Invoice:</h2>
+    <div>
+        <form action="" method="post">
+            {% csrf_token %}
+            <p>Delete invoice?</p>
+            <a href="{{request.META.HTTP_REFERER}}">Back</a>
+            <button type="submit">Delete</button>
+        </form>
+    </div>
+{% endblock %}

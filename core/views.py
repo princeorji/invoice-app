@@ -17,7 +17,11 @@ def invoice_list(request):
     page_obj = paginator.get_page(page_number)
 
     q = request.GET.get('q') if request.GET.get('q') != None else ''
-    client_search = clients.filter(Q(name__icontains=q))
+    client_search = clients.filter(
+        Q(first_name__icontains=q) |
+        Q(last_name__icontains=q) |
+        Q(organisation__icontains=q)
+    )
 
     context = {
         'clients': clients,
@@ -45,7 +49,7 @@ def create_invoice(request):
         if f_client.is_valid() or f_bill.is_valid():
             f_client.save()
             f_bill.save()
-            return redirect('core:index')
+            return redirect('core:invoice-list')
     context = {
         'f_client': f_client,
         'f_bill': f_bill
@@ -65,7 +69,7 @@ def update_invoice(request, pk):
         if f_client.is_valid() or f_bill.is_valid():
             f_client.save()
             f_bill.save()
-            return redirect('core:index')
+            return redirect('core:invoice-list')
     context = {
         'f_client': f_client,
         'f_bill': f_bill
@@ -79,7 +83,7 @@ def delete_invoice(request, pk):
     if request.method == 'POST':
         client.delete()
         bill.delete()
-        return redirect('core:index')
+        return redirect('core:invoice-list')
     context = {
         'client': client,
         'bill': bill
