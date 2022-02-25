@@ -1,15 +1,18 @@
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
+from django.views.generic import TemplateView
 
-from .models import Invoice, Service
+from .models import Invoice
 from .forms import InvoiceForm, ServiceFormSet
 
 # Create your views here.
 
-def index(request):
-    return render(request, 'index.html')
+class IndexView(TemplateView):
+    template_name = 'index.html'
 
+@login_required(login_url='account_login')
 def invoice_list(request):
     invoice_list = Invoice.objects.all().order_by('-date')
 
@@ -27,17 +30,16 @@ def invoice_list(request):
     }
     return render(request, 'invoice-list.html', context)
 
+@login_required(login_url='account_login')
 def invoice_detail(request, pk):
     invoice = Invoice.objects.get(pk=pk)
 
-    context = {
-        'invoice': invoice,
-    }
-    return render(request, 'invoice-detail.html', context)
+    return render(request, 'invoice-detail.html', {"invoice": invoice})
 
+@login_required(login_url='account_login')
 def create_invoice(request):
-    formset = ServiceFormSet()
     form = InvoiceForm()
+    formset = ServiceFormSet()
 
     if request.method == 'POST':
         formset = ServiceFormSet(request.POST)
@@ -51,12 +53,7 @@ def create_invoice(request):
             form.total_amount = total
             form.save()
             return redirect('invoice-list')
-
-    context = {
-        "formset": formset,
-        "form": form,
-    }
-    return render(request, 'create-invoice.html', context)
+    return render(request, 'create-invoice.html', {"form": form, "formset": formset})
 
 
 
