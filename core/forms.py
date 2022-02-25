@@ -1,22 +1,25 @@
-from turtle import textinput
 from django import forms
 from django.forms import TextInput, ModelForm
-from .models import Bill, Client
+from django.forms import formset_factory
+
+from .models import Invoice, Service
 
 class DateInput(forms.DateInput):
     input_type = 'date'
 
-class ClientForm(ModelForm):
+class InvoiceForm(ModelForm):
     class Meta:
-        model = Client
+        model = Invoice
         fields = '__all__'
         widgets = {'phone_number': TextInput(attrs={
             'placeholder': '+234'
             })}
 
-class BillForm(ModelForm):
+class ServiceForm(ModelForm):
     class Meta:
-        model = Bill
+        model = Service
         fields = '__all__'
+        exclude = ('customer',)
         widgets = {'pay_date': DateInput}
 
+ServiceFormSet = formset_factory(ServiceForm)

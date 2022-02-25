@@ -2,8 +2,8 @@ from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 
-from .models import Client, Bill
-from .forms import ClientForm, BillForm
+from .models import Invoice, Service
+from .forms import InvoiceForm, ServiceFormSet
 
 # Create your views here.
 
@@ -11,82 +11,54 @@ def index(request):
     return render(request, 'index.html')
 
 def invoice_list(request):
-    clients = Client.objects.all()
-    paginator = Paginator(clients, 10)
+    invoice_list = Invoice.objects.all().order_by('-date')
+
+    paginator = Paginator(invoice_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     q = request.GET.get('q') if request.GET.get('q') != None else ''
-    client_search = clients.filter(
-        Q(first_name__icontains=q) |
-        Q(last_name__icontains=q) |
-        Q(organisation__icontains=q)
-    )
+    search = invoice_list.filter(Q(date__icontains=q))
 
     context = {
-        'clients': clients,
+        'invoice_list': invoice_list,
         'page_obj': page_obj,
-        'client_search': client_search
+        'search': search
     }
-    return render(request, 'invoice_list.html', context)
+    return render(request, 'invoice-list.html', context)
 
 def invoice_detail(request, pk):
-    client = Client.objects.get(pk=pk)
-    bill = Bill.objects.filter(client=client)
+    invoice = Invoice.objects.get(pk=pk)
+
     context = {
-        'client': client,
-        'bill': bill
+        'invoice': invoice,
     }
-    return render(request, 'invoice_detail.html', context)
+    return render(request, 'invoice-detail.html', context)
 
 def create_invoice(request):
-    f_client = ClientForm
-    f_bill = BillForm
+    formset = ServiceFormSet()
+    form = InvoiceForm()
 
     if request.method == 'POST':
-        f_client = ClientForm(request.POST or None)
-        f_bill = BillForm(request.POST or None)
-        if f_client.is_valid() or f_bill.is_valid():
-            f_client.save()
-            f_bill.save()
-            return redirect('core:invoice-list')
+        formset = ServiceFormSet(request.POST)
+        form = InvoiceForm(request.POST)
+        if form.is_valid() and formset.is_valid():
+            total = 0
+            for form in formset:
+                amount = float(formset.rate)*float(formset.quantity)
+                total += amount
+                formset.save()
+            form.total_amount = total
+            form.save()
+            return redirect('invoice-list')
+
     context = {
-        'f_client': f_client,
-        'f_bill': f_bill
+        "formset": formset,
+        "form": form,
     }
-    return render(request, 'cru_invoice.html', context)
+    return render(request, 'create-invoice.html', context)
 
-def update_invoice(request, pk):
-    client = Client.objects.get(pk=pk)
-    bill = Bill.objects.get(pk=pk)
 
-    f_client = ClientForm(instance=client)
-    f_bill = BillForm(instance=bill)
 
-    if request.method == 'POST':
-        f_client = ClientForm(request.POST, instance=client)
-        f_bill = BillForm(request.POST, instance=bill)
-        if f_client.is_valid() or f_bill.is_valid():
-            f_client.save()
-            f_bill.save()
-            return redirect('core:invoice-list')
-    context = {
-        'f_client': f_client,
-        'f_bill': f_bill
-    }
-    return render(request, 'cru_invoice.html', context)
 
-def delete_invoice(request, pk):
-    client = Client.objects.get(pk=pk)
-    bill = Bill.objects.get(pk=pk)
-
-    if request.method == 'POST':
-        client.delete()
-        bill.delete()
-        return redirect('core:invoice-list')
-    context = {
-        'client': client,
-        'bill': bill
-    }
-    return render(request, 'delete_invoice.html', context)
 

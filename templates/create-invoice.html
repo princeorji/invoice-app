@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-    <h2>Delete Invoice:</h2>
+    <h2>Create Invoice:</h2>
     <div>
-        <form action="" method="post">
+        <form autocomplete="off" method="post">
             {% csrf_token %}
-            <p>Delete invoice?</p>
+            {{form.as_p}}
+            {{formset.as_p}}
             <a href="{{request.META.HTTP_REFERER}}">Back</a>
-            <button type="submit">Delete</button>
+            <button type="submit">Create</button>
         </form>
     </div>
 {% endblock %}

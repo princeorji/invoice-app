@@ -3,5 +3,5 @@ from .models import *
 
 # Register your models here.
 
-admin.site.register(Client)
-admin.site.register(Bill)
+admin.site.register(Invoice)
+admin.site.register(Service)

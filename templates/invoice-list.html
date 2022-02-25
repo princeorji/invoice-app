@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-    <h3>Invoice List
-        <span>
-            <a href="{% url 'core:create-invoice' %}">+ Add new Invoice</a>
-        </span>
-    </h3>
+    <h2>Invoice List
+        <h4>
+            <a href="{% url 'create-invoice' %}">+ Add new Invoice</a>
+        </h4>
+    </h2>
 
-    <form action="{% url 'core:invoice-list' %}" method="get">
-        <input type="text" name="q" placeholder="search...">
+    <form action="{% url 'invoice-list' %}" method="get">
+        <input type="date" name="q" placeholder="search date">
     </form>
 
     <div>
-        {% for client in clients %}
+        {% for invoice in invoice_list %}
             <table>
                 <tr>
                     <th>id</th>
@@ -24,18 +24,18 @@
                 </tr>
                 <tr>
                     <td>
-                        <a href="{% url 'core:invoice-detail' client.pk %}">{{client.uuid}}</a>
+                        <a href="{% url 'invoice-detail' invoice.pk %}">#{{invoice.uuid | slice:":4"}}</a>
                     </td>
-                    <td>{{client.first_name}}</td>
-                    <td>{{client.last_name}}</td>
-                    <td>{{client.email}}</td>
-                    <td>{{client.organisation}}</td>
-                    <td></td>
+                    <td>{{invoice.first_name}}</td>
+                    <td>{{invoice.last_name}}</td>
+                    <td>{{invoice.email}}</td>
+                    <td>{{invoice.organisation}}</td>
+                    <td>status</td>
                     <td>
-                        <a href="{% url 'core:update-invoice' client.pk %}">Edit</a>
+                        <a href="">Edit</a>
                     </td>
                     <td>
-                        <a href="{% url 'core:delete-invoice' client.pk %}">Delete</a>
+                        <a href="">Delete</a>
                     </td>
                 </tr>
             </table>
