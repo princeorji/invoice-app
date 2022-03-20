@@ -1,6 +1,5 @@
 from django.db import models
 from django.db.models import F, Sum
-from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 
 from decimal import Decimal
@@ -17,14 +16,12 @@ class Invoice(models.Model):
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=50)
     email = models.EmailField()
-    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
-    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
-    address_one = models.CharField(max_length=100)
-    address_two = models.CharField(max_length=100, blank=True)
+    address = models.CharField(max_length=100)
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
+    postal_code = models.IntegerField()
     created_on =  models.DateField(auto_now_add=True)
-    status = models.PositiveIntegerField(choices=PAYMENT_STATUS)
+    status = models.PositiveIntegerField(choices=PAYMENT_STATUS, default='pending')
 
     def __str__(self):
         return self.name

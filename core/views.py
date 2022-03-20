@@ -14,27 +14,20 @@ class IndexView(TemplateView):
 
 @login_required(login_url='account_login')
 def invoice_list(request):
-    invoice_list = Invoice.objects.all().order_by('-date')
-
+    invoice_list = Invoice.objects.all().order_by('-created_on')
     paginator = Paginator(invoice_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     q = request.GET.get('q') if request.GET.get('q') != None else ''
-    search = invoice_list.filter(Q(date__icontains=q))
+    search = invoice_list.filter(Q(status__icontains=q))
 
     context = {
         'invoice_list': invoice_list,
         'page_obj': page_obj,
         'search': search
     }
-    return render(request, 'invoice-list.html', context)
-
-@login_required(login_url='account_login')
-def invoice_detail(request, pk):
-    invoice = Invoice.objects.get(pk=pk)
-
-    return render(request, 'invoice-detail.html', {"invoice": invoice})
+    return render(request, 'invoice/invoice_item_view.html', context)
 
 @login_required(login_url='account_login')
 def create_invoice(request):
@@ -45,17 +38,12 @@ def create_invoice(request):
         formset = ServiceFormSet(request.POST)
         form = InvoiceForm(request.POST)
         if form.is_valid() and formset.is_valid():
-            total = 0
             for form in formset:
-                amount = float(formset.rate)*float(formset.quantity)
-                total += amount
                 formset.save()
-            form.total_amount = total
             form.save()
             return redirect('invoice-list')
-    return render(request, 'create-invoice.html', {"form": form, "formset": formset})
-
-
-
-
-
+    context = {
+        'form': form,
+        'formset': formset
+    }
+    return render(request, 'invoice/invoice_item_form.html', context)

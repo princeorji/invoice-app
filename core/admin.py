@@ -4,7 +4,7 @@ from .models import *
 # Register your models here.
 
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'phone_number', 'uuid')
+    list_display = ('name', 'email', 'uuid')
 
 class ServiceAdmin(admin.ModelAdmin):
     list_display = ('service', 'quantity', 'rate', 'due_date')

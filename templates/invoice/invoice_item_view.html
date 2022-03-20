@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div>
+        <div>
+            <h1>Invoices
+                <h4><a href="{% url 'create-invoice' %}">+ New Invoice</a></h4>
+
+                <form action="{% url 'invoice-list' %}" method="get">
+                    <input type="text" name="q">
+                </form>
+            </h1>
+
+            <div>
+                {% for invoice in invoice_list %}
+                    <table>
+                        <tr>
+                            <td>#{{invoice.uuid | slice:":5"}}</td>
+                            <td>{{invoice.created_on}}</td>
+                            <td>{{invoice.name}}</td>
+                            <td>{{invoice.email}}</td>
+                            <td>{{invoice.status}}</td>
+                            <td>
+                                <a href="">></a>
+                            </td>
+                        </tr>
+                    </table>
+                {% endfor %}
+            </div>
+            <div class="pagination">
+                <span>
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo;first</a>
+                        <a href="?page={{page_obj.previous_page_number}}">previous</a>
+                    {% endif %}
+                    <span>
+                        Page {{page_obj.number}} of {{page_obj.paginator.num_pages}}
+                    </span>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{page_obj.next_page_number}}">next</a>
+                        <a href="?page={{page_obj.paginator.num_pages}}">last &laquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+        </div> 
+    </div>
+{% endblock %}

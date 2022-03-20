@@ -1,7 +1,6 @@
-import os, django_heroku, dj_database_url
-import environ
 from pathlib import Path
 from decouple import config
+import os, django_heroku, environ
 
 env = environ.Env(
     # set casting, default value
@@ -132,7 +131,7 @@ STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
-    ]
+]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
@@ -150,3 +149,4 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_USERNAME_REQUIRED = False
 
 LOGIN_REDIRECT_URL = 'core:index'
+LOGOUT_REDIRECT_URL = 'core:index'
